@@ -38,7 +38,7 @@ func partOne(list1 []int, list2 []int) {
 
 	totalDistance := 0
 
-	for i := range len(list1) {
+	for i := range list1 {
 		distance := math.Abs(float64(list1[i]) - float64(list2[i]))
 		totalDistance = totalDistance + int(distance)
 	}
