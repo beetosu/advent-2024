@@ -33,6 +33,9 @@ func main() {
 			correctMiddlePageCount += middlePage
 		} else {
 			reorderedUpdate := reorderUpdate(update, rulesMap)
+			middleIdx := int(len(reorderedUpdate) / 2)
+			middlePage, _ := strconv.Atoi(reorderedUpdate[middleIdx])
+			incorrectMiddlePageCount += middlePage
 		}
 	}
 	fmt.Println("PART ONE: ", correctMiddlePageCount)
@@ -111,10 +114,36 @@ func updateIsValid(update []string, rulesMap map[int][]int) bool {
 
 func reorderUpdate(badUpdate []string, rulesMap map[int][]int) []string {
 	reorderedUpdate := []string{badUpdate[0]}
-	for _, page := range badUpdate {
-		// iterate through the bad update, and when a conflict occurs
-		// shift the offending pageNum back until it no longer conflicts.
-		fmt.Println(page)
+	badUpdate = badUpdate[1:]
+	for len(badUpdate) > 0 {
+		pageAdded := false
+		pageToAdd, _ := strconv.Atoi(badUpdate[0])
+		for idx := len(reorderedUpdate) - 1; idx >= 0; idx -= 1 {
+			pageCursor, _ := strconv.Atoi(reorderedUpdate[idx])
+			if slices.Contains(rulesMap[pageToAdd], pageCursor) {
+				continue
+			}
+
+			reorderedUpdate = AddAtIndex(reorderedUpdate, badUpdate[0], idx)
+			badUpdate = badUpdate[1:]
+			pageAdded = true
+			break
+		}
+		if !pageAdded {
+			reorderedUpdate = append([]string{badUpdate[0]}, reorderedUpdate...)
+			badUpdate = badUpdate[1:]
+		}
 	}
 	return reorderedUpdate
+}
+
+func AddAtIndex(oldList []string, newElement string, newIdx int) []string {
+	var newList []string
+	for idx, element := range oldList {
+		newList = append(newList, element)
+		if idx == newIdx {
+			newList = append(newList, newElement)
+		}
+	}
+	return newList
 }
